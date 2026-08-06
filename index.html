@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Age Verification Calculator — check a date of birth against a threshold</title>
+<meta name="description" content="Enter a date of birth to compute exact age and check it against 18+ or a custom threshold. Runs in your browser; nothing is stored.">
+<meta name="keywords" content="kyc, date-of-birth-check, onboarding, compliance-tools, age-verification, age-calculator">
+<meta property="og:title" content="Age Verification Calculator — check a date of birth against a threshold">
+<meta property="og:description" content="Enter a date of birth to compute exact age and check it against 18+ or a custom threshold. Runs in your browser; nothing is stored.">
+<meta property="og:type" content="website">
+<style>
+:root{color-scheme:light dark;--bg:#fff;--fg:#1a1a1a;--muted:#666;--line:#e2e2e2;
+--accent:#2563eb;--card:#f7f8fa;--ok:#1a7f37;--warn:#b7791f;--bad:#cf222e}
+@media(prefers-color-scheme:dark){:root{--bg:#161616;--fg:#e8e8e8;--muted:#a0a0a0;
+--line:#333;--accent:#7aa2f7;--card:#1e2128;--ok:#3fb950;--warn:#d29922;--bad:#f85149}}
+*{box-sizing:border-box}
+body{margin:0;padding:2rem 1.1rem 4rem;background:var(--bg);color:var(--fg);
+font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+main{max-width:44rem;margin:0 auto}
+h1{font-size:1.85rem;line-height:1.2;margin:0 0 .4rem}
+h2{font-size:1.2rem;margin:2.2rem 0 .7rem;padding-top:1.1rem;border-top:1px solid var(--line)}
+h3{font-size:1rem;margin:1.2rem 0 .3rem}
+p{margin:0 0 1rem}.lede{color:var(--muted);font-size:1.05rem;margin-bottom:1.6rem}
+a{color:var(--accent)}
+.tool{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:1.2rem;margin:1.5rem 0}
+.tool label{display:block;font-size:.85rem;color:var(--muted);margin:.7rem 0 .2rem;font-weight:600}
+.tool input,.tool select{width:100%;padding:.55rem .65rem;border:1px solid var(--line);
+border-radius:7px;background:var(--bg);color:var(--fg);font:inherit;font-size:.95rem}
+.tool .row{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+@media(max-width:520px){.tool .row{grid-template-columns:1fr}}
+.tool button{margin-top:1rem;padding:.6rem 1.1rem;border:0;border-radius:7px;
+background:var(--accent);color:#fff;font:inherit;font-weight:600;cursor:pointer}
+.tool button.sec{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+.out{margin-top:1rem;padding:.9rem 1rem;border-radius:8px;background:var(--bg);
+border:1px solid var(--line);font-size:.95rem;min-height:1.5rem}
+.out .big{font-size:1.6rem;font-weight:700;letter-spacing:-.5px}
+.out table{width:100%;border-collapse:collapse;font-size:.9rem;margin-top:.4rem}
+.out td{padding:.35rem .2rem;border-bottom:1px solid var(--line)}
+.out td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.ok{color:var(--ok)}.warn{color:var(--warn)}.bad{color:var(--bad)}
+.note{font-size:.82rem;color:var(--muted);margin-top:.6rem}
+ul{margin:0 0 1rem 1.2rem}li{margin-bottom:.35rem}
+footer{margin-top:2.5rem;padding-top:1.1rem;border-top:1px solid var(--line);color:var(--muted);font-size:.9rem}
+</style>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Is the date stored?", "acceptedAnswer": {"@type": "Answer", "text": "No. It is calculated in your browser and never sent anywhere."}}, {"@type": "Question", "name": "Does this verify identity?", "acceptedAnswer": {"@type": "Answer", "text": "No. It computes age from a date you enter. Confirming that the date belongs to a real person is document or database verification, which this does not do."}}, {"@type": "Question", "name": "How does it handle the birthday edge case?", "acceptedAnswer": {"@type": "Answer", "text": "It subtracts one year if the birthday has not yet occurred this calendar year, so someone turning 18 tomorrow reads as 17 today \u2014 the correct answer for a gate."}}]}</script>
+</head><body><main>
+<h1>Age Verification Calculator — check a date of birth against a threshold</h1>
+<p class="lede">Enter a date of birth to compute exact age and check it against 18+ or a custom threshold. Runs in your browser; nothing is stored.</p>
+<div class="tool">
+<div class="row">
+  <div><label>Date of birth</label><input id="dob" type="date" oninput="calc()"></div>
+  <div><label>Threshold (years)</label><input id="thr" type="number" value="18" min="0" step="1" oninput="calc()"></div>
+</div>
+<div class="out" id="o" aria-live="polite"></div>
+<script>
+function calc(){
+  var v=document.getElementById('dob').value,thr=+document.getElementById('thr').value||0,o=document.getElementById('o');
+  if(!v){o.innerHTML='<span class="muted">Enter a date of birth.</span>';return;}
+  var b=new Date(v+'T00:00:00'),n=new Date();
+  var age=n.getFullYear()-b.getFullYear();
+  var m=n.getMonth()-b.getMonth();
+  if(m<0||(m===0&&n.getDate()<b.getDate()))age--;
+  if(age<0){o.innerHTML='<span class="bad">Date is in the future.</span>';return;}
+  var pass=age>=thr;
+  o.innerHTML='<div class="big '+(pass?'ok':'bad')+'">'+age+' years old</div>'+
+    '<div class="'+(pass?'ok':'bad')+'">'+(pass?'✓ Meets':'✗ Below')+' the '+thr+'+ threshold</div>'+
+    '<div class="note">Computes age from the date entered — not an identity check.</div>';
+}
+</script></div>
+<p class="note">Everything runs in your browser. No data is uploaded or stored.</p>
+<h2>About this tool</h2>
+<p>A quick utility: A calculator that turns a date of birth into an exact age and checks it against an age threshold.</p><p>It handles the awkward part correctly — whether the birthday has occurred yet this year — so an 18+ or 21+ gate returns the right answer on the boundary. Useful when building or testing an onboarding age check.</p><p>It computes locally and stores nothing; it is a utility, not an identity check.</p>
+<h2>How to use it</h2>
+<ol><li>Enter the date of birth.</li><li>Set the age threshold (18 by default).</li><li>Read the exact age and whether it meets the threshold.</li></ol>
+<h2>Frequently asked questions</h2>
+<h3>Is the date stored?</h3><p>No. It is calculated in your browser and never sent anywhere.</p><h3>Does this verify identity?</h3><p>No. It computes age from a date you enter. Confirming that the date belongs to a real person is document or database verification, which this does not do.</p><h3>How does it handle the birthday edge case?</h3><p>It subtracts one year if the birthday has not yet occurred this calendar year, so someone turning 18 tomorrow reads as 17 today — the correct answer for a gate.</p>
+<footer><p>Built by the team behind
+<a href="https://finauth.io" rel="noopener">FinAuth</a> — KYC, identity verification, and AML onboarding for fintech and regulated businesses.</p></footer>
+</main></body></html>
